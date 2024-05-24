@@ -19,7 +19,7 @@ wgpu = "0.12"
 
 legion = "0.4"
 
-rodio = "0.15"
+rodio = "0.18"
 
 serde= "*"
 ron = "0.7"

@@ -1,4 +1,4 @@
-use rodio::{source::Source, Decoder, OutputStreamHandle, Sample};
+use rodio::{cpal::FromSample, source::Source, Decoder, OutputStreamHandle, Sample};
 use std::{
     path::Path,
     sync::{Arc, RwLock},
@@ -310,7 +310,7 @@ where
 {
     #[inline]
     fn current_frame_len(&self) -> Option<usize> {
-        None
+        Some(self.buffer.data.len() / self.buffer.channels as usize)
     }
 
     #[inline]
@@ -325,7 +325,9 @@ where
 
     #[inline]
     fn total_duration(&self) -> Option<Duration> {
-        None
+        Some(Duration::from_secs_f32(
+            self.buffer.data.len() as f32 / self.buffer.sample_rate as f32,
+        ))
     }
 }
 
@@ -341,6 +343,7 @@ pub struct AudioController<S> {
 impl<S> AudioController<S>
 where
     S: Sample + Send + Sync + 'static,
+    f32: FromSample<S>,
 {
     fn new(sink: rodio::Sink, buffer: Arc<SamplesBuffer<S>>) -> Self {
         sink.set_volume(0.25);
